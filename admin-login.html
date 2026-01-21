@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دخول لوحة التحكم - نييون ستور</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --galaxy-black: #0c0c1d;
+            --galaxy-dark: #1a1a2e;
+            --galaxy-blue: #16213e;
+            --galaxy-purple: #4a1e5a;
+            --galaxy-pink: #9d4edd;
+            --galaxy-light: #e0aaff;
+            --galaxy-cyan: #00bbf9;
+            --galaxy-green: #00f5d4;
+            --neon-red: #ff006e;
+            --neon-yellow: #ffd60a;
+            --text-light: #f8f9fa;
+            --text-gray: #adb5bd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #000000 0%, #0c0c1d 50%, #1a1a2e 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* خلفية متحركة */
+        .galaxy-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        /* النجوم الطائرة */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: fly linear infinite;
+        }
+        
+        @keyframes fly {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(var(--random-x)) scale(0);
+                opacity: 0;
+            }
+        }
+        
+        /* تأثير النجوم الساطعة */
+        .twinkle-star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite, float 6s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { 
+                opacity: 0.2;
+                box-shadow: 0 0 5px currentColor;
+            }
+            50% { 
+                opacity: 1;
+                box-shadow: 0 0 20px currentColor;
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+        
+        /* تأثير السديم */
+        .nebula {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.3;
+            animation: nebulaFloat 30s ease-in-out infinite;
+        }
+        
+        @keyframes nebulaFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -30px) scale(1.2); }
+            50% { transform: translate(-40px, 20px) scale(0.9); }
+            75% { transform: translate(30px, 40px) scale(1.1); }
+        }
+        
+        /* تأثير النييون في الخلفية */
+        .neon-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 187, 249, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 187, 249, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+            opacity: 0.5;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(25px) translateX(25px); }
+        }
+        
+        /* حاوية الدخول */
+        .login-container {
+            background: rgba(12, 12, 29, 0.85);
+            border-radius: 20px;
+            padding: 35px 30px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid transparent;
+            box-shadow: 
+                0 0 30px rgba(0, 187, 249, 0.2),
+                0 0 60px rgba(157, 78, 221, 0.1),
+                inset 0 0 20px rgba(0, 187, 249, 0.1);
+            backdrop-filter: blur(15px);
+            position: relative;
+            z-index: 1;
+            animation: containerGlow 4s ease-in-out infinite alternate;
+            overflow: hidden;
+        }
+        
+        @keyframes containerGlow {
+            0% {
+                box-shadow: 
+                    0 0 30px rgba(0, 187, 249, 0.2),
+                    0 0 60px rgba(157, 78, 221, 0.1),
+                    inset 0 0 20px rgba(0, 187, 249, 0.1);
+                border-color: transparent;
+            }
+            100% {
+                box-shadow: 
+                    0 0 40px rgba(0, 187, 249, 0.3),
+                    0 0 80px rgba(157, 78, 221, 0.2),
+                    inset 0 0 30px rgba(0, 187, 249, 0.2);
+                border-color: rgba(0, 187, 249, 0.3);
+            }
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                var(--galaxy-cyan), 
+                var(--galaxy-pink), 
+                var(--galaxy-green), 
+                var(--galaxy-cyan));
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0;
+            animation: borderRotate 8s linear infinite;
+            filter: blur(10px);
+        }
+        
+        @keyframes borderRotate {
+            0% {
+                transform: rotate(0deg);
+                opacity: 0.3;
+            }
+            100% {
+                transform: rotate(360deg);
+                opacity: 0.3;
+            }
+        }
+        
+        /* الهيدر */
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .login-logo {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            animation: logoRotate 10s linear infinite;
+        }
+        
+        .logo-circle:nth-child(1) {
+            border-top-color: var(--galaxy-cyan);
+            border-right-color: var(--galaxy-cyan);
+        }
+        
+        .logo-circle:nth-child(2) {
+            border-bottom-color: var(--galaxy-pink);
+            border-left-color: var(--galaxy-pink);
+            animation-direction: reverse;
+            animation-duration: 8s;
+        }
+        
+        @keyframes logoRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .logo-icon {
+            font-size: 2.8rem;
+            color: var(--galaxy-cyan);
+            animation: iconPulse 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 15px rgba(0, 187, 249, 0.7);
+        }
+        
+        @keyframes iconPulse {
+            0% {
+                transform: scale(1);
+                text-shadow: 0 0 10px rgba(0, 187, 249, 0.7);
+            }
+            100% {
+                transform: scale(1.1);
+                text-shadow: 0 0 25px rgba(0, 187, 249, 1);
+            }
+        }
+        
+        .login-header h1 {
+            background: linear-gradient(90deg, var(--galaxy-cyan), var(--galaxy-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        
+        .login-header p {
+            color: var(--text-gray);
+            font-size: 0.95rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .login-header p::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            right: 0;
+            width: 0;
+            height: 1.5px;
+            background: linear-gradient(90deg, var(--galaxy-cyan), var(--galaxy-pink));
+            animation: underlineExpand 3s ease-in-out infinite;
+        }
+        
+        @keyframes underlineExpand {
+            0%, 100% { width: 0; right: 0; }
+            50% { width: 100%; right: 0; }
+            75% { width: 0; right: 100%; }
+        }
+        
+        /* الفورم - جعل الحقول أصغر */
+        .login-form .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+        
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-container {
+            position: relative;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 12px 15px;
+            padding-left: 45px;
+            background: rgba(26, 26, 46, 0.4);
+            border: 1.5px solid rgba(157, 78, 221, 0.2);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--galaxy-cyan);
+            box-shadow: 
+                0 0 0 2px rgba(0, 187, 249, 0.1),
+                inset 0 0 10px rgba(0, 187, 249, 0.1);
+            background: rgba(26, 26, 46, 0.6);
+            transform: translateY(-1px);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--galaxy-cyan);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .login-form input:focus + .input-icon {
+            color: var(--galaxy-pink);
+            text-shadow: 0 0 8px var(--galaxy-pink);
+            animation: iconShake 0.5s ease-in-out;
+        }
+        
+        @keyframes iconShake {
+            0%, 100% { transform: translateY(-50%) rotate(0); }
+            25% { transform: translateY(-50%) rotate(-10deg); }
+            75% { transform: translateY(-50%) rotate(10deg); }
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--galaxy-cyan) 0%, var(--galaxy-pink) 50%, var(--galaxy-cyan) 100%);
+            background-size: 200% 100%;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+            animation: buttonShine 3s ease-in-out infinite;
+        }
+        
+        @keyframes buttonShine {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .login-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(157, 78, 221, 0.4);
+        }
+        
+        .login-button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+        
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s;
+        }
+        
+        .login-button:hover::before {
+            left: 100%;
+        }
+        
+        .button-icon {
+            margin-left: 8px;
+            animation: iconFloat 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        
+        .back-to-store {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--galaxy-cyan);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            position: relative;
+            padding: 8px 0;
+        }
+        
+        .back-to-store::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 1.5px;
+            background: linear-gradient(90deg, var(--galaxy-cyan), var(--galaxy-pink));
+            transition: width 0.3s;
+        }
+        
+        .back-to-store:hover {
+            color: var(--galaxy-pink);
+        }
+        
+        .back-to-store:hover::before {
+            width: 100%;
+        }
+        
+        .arrow-icon {
+            margin-right: 8px;
+            transition: transform 0.3s;
+        }
+        
+        .back-to-store:hover .arrow-icon {
+            transform: translateX(3px);
+        }
+        
+        /* الإشعارات المصغرة */
+        .notification-container {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 300px;
+        }
+        
+        .notification {
+            background: linear-gradient(135deg, var(--galaxy-dark), var(--galaxy-blue));
+            color: white;
+            padding: 15px 18px;
+            border-radius: 12px;
+            border-left: 4px solid var(--galaxy-cyan);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(400px) scale(0.9);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+        }
+        
+        .notification.show {
+            transform: translateX(0) scale(1);
+            opacity: 1;
+        }
+        
+        .notification-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            text-shadow: 0 0 12px currentColor;
+        }
+        
+        .notification.error .notification-icon {
+            color: #ff6b6b;
+        }
+        
+        .notification.success .notification-icon {
+            color: var(--galaxy-green);
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 800;
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+        }
+        
+        .notification-message {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .notification-close:hover {
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+        
+        /* تأثيرات إضافية */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, var(--color) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: particleFloat 20s linear infinite;
+        }
+        
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- خلفية المجرة -->
+    <div class="galaxy-bg">
+        <div class="stars" id="stars"></div>
+        <div class="nebula" id="nebula1"></div>
+        <div class="nebula" id="nebula2"></div>
+        <div class="nebula" id="nebula3"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+    <div class="neon-grid"></div>
+    
+    <!-- حاوية الدخول -->
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <div class="logo-circle"></div>
+                <div class="logo-circle"></div>
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+            <h1>نييون ستور</h1>
+            <p>لوحة التحكم الإدارية</p>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label for="username">اسم المستخدم</label>
+                <div class="input-container">
+                    <input type="text" id="username" required>
+                    <span class="input-icon"><i class="fas fa-user"></i></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <div class="input-container">
+                    <input type="password" id="password" required>
+                    <span class="input-icon"><i class="fas fa-lock"></i></span>
+                </div>
+            </div>
+            
+            <button type="submit" class="login-button">
+                <i class="fas fa-sign-in-alt button-icon"></i> دخول
+            </button>
+        </form>
+        
+        <a href="index.html" class="back-to-store">
+            <i class="fas fa-arrow-left arrow-icon"></i> العودة إلى المتجر
+        </a>
+    </div>
+    
+    <!-- الإشعارات -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script>
+        // بيانات الدخول
+        const adminCredentials = {
+            username: 'admin',
+            password: 'hamza_2007'
+        };
+        
+        // إنشاء النجوم والجسيمات
+        function createGalaxy() {
+            const starsContainer = document.getElementById('stars');
+            const particlesContainer = document.getElementById('particles');
+            
+            // إنشاء النجوم الطائرة
+            const starCount = 180;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 3 + 1;
+                const speed = Math.random() * 20 + 10;
+                const delay = Math.random() * 25;
+                const randomX = (Math.random() - 0.5) * 120;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.animationDuration = `${speed}s`;
+                star.style.animationDelay = `${delay}s`;
+                star.style.setProperty('--random-x', `${randomX}vw`);
+                
+                if (Math.random() > 0.6) {
+                    const colors = ['#00bbf9', '#9d4edd', '#00f5d4', '#ff006e'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    star.style.backgroundColor = color;
+                    star.style.boxShadow = `0 0 12px ${color}, 0 0 24px ${color}`;
+                }
+                
+                starsContainer.appendChild(star);
+            }
+            
+            // النجوم الساطعة
+            const twinkleCount = 40;
+            for (let i = 0; i < twinkleCount; i++) {
+                const twinkleStar = document.createElement('div');
+                twinkleStar.classList.add('twinkle-star');
+                
+                const size = Math.random() * 5 + 2;
+                twinkleStar.style.width = `${size}px`;
+                twinkleStar.style.height = `${size}px`;
+                twinkleStar.style.left = `${Math.random() * 100}vw`;
+                twinkleStar.style.top = `${Math.random() * 100}vh`;
+                twinkleStar.style.animationDelay = `${Math.random() * 2}s`;
+                twinkleStar.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                
+                if (Math.random() > 0.4) {
+                    const colors = ['#00bbf9', '#9d4edd', '#00f5d4'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    twinkleStar.style.backgroundColor = color;
+                    twinkleStar.style.color = color;
+                }
+                
+                starsContainer.appendChild(twinkleStar);
+            }
+            
+            // إنشاء السديم
+            const nebulaColors = [
+                'rgba(0, 187, 249, 0.12)',
+                'rgba(157, 78, 221, 0.12)',
+                'rgba(0, 245, 212, 0.08)',
+                'rgba(255, 0, 110, 0.08)'
+            ];
+            
+            for (let i = 1; i <= 3; i++) {
+                const nebula = document.getElementById(`nebula${i}`);
+                const size = Math.random() * 300 + 150;
+                const color = nebulaColors[Math.floor(Math.random() * nebulaColors.length)];
+                
+                nebula.style.width = `${size}px`;
+                nebula.style.height = `${size}px`;
+                nebula.style.left = `${Math.random() * 100}vw`;
+                nebula.style.top = `${Math.random() * 100}vh`;
+                nebula.style.backgroundColor = color;
+                nebula.style.animationDelay = `${Math.random() * 10}s`;
+                nebula.style.animationDuration = `${Math.random() * 20 + 15}s`;
+            }
+            
+            // إنشاء جسيمات متحركة
+            const particleCount = 25;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 80 + 40;
+                const colors = ['#00bbf9', '#9d4edd', '#00f5d4'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.setProperty('--color', color);
+                particle.style.animationDuration = `${Math.random() * 25 + 15}s`;
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // تأثيرات على حقول الإدخال
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+            
+            // تأثير عند الكتابة
+            input.addEventListener('input', function() {
+                if (this.value.length > 0) {
+                    this.style.boxShadow = '0 0 0 2px rgba(0, 187, 249, 0.2), inset 0 0 12px rgba(0, 187, 249, 0.2)';
+                } else {
+                    this.style.boxShadow = '';
+                }
+            });
+        });
+        
+        // نظام الإشعارات
+        function showNotification(message, type = 'error') {
+            const notificationContainer = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icons = {
+                error: 'fas fa-exclamation-circle',
+                success: 'fas fa-check-circle'
+            };
+            
+            const titles = {
+                error: 'خطأ في الدخول',
+                success: 'تم الدخول بنجاح'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${icons[type] || icons.error}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${titles[type] || titles.error}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            const autoClose = setTimeout(() => {
+                closeNotification(notification);
+            }, 4000);
+            
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                clearTimeout(autoClose);
+                closeNotification(notification);
+            });
+        }
+        
+        function closeNotification(notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 500);
+        }
+        
+        // معالجة تسجيل الدخول
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // تأثير على الزر
+            const button = this.querySelector('.login-button');
+            const originalText = button.innerHTML;
+            const originalAnimation = button.style.animation;
+            
+            button.style.transform = 'scale(0.95)';
+            button.style.animation = 'none';
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                button.style.animation = originalAnimation;
+                
+                if (username === adminCredentials.username && password === adminCredentials.password) {
+                    // تأثير النجاح
+                    button.innerHTML = '<i class="fas fa-check button-icon"></i> جاري الدخول...';
+                    button.style.background = 'linear-gradient(135deg, #00f5d4 0%, #00bbf9 100%)';
+                    
+                    setTimeout(() => {
+                        localStorage.setItem('neonStoreAdminLoggedIn', 'true');
+                        localStorage.setItem('neonStoreAdminLoginTime', new Date().toISOString());
+                        window.location.href = 'admin-panel.html';
+                    }, 800);
+                } else {
+                    // تأثير الخطأ
+                    button.innerHTML = '<i class="fas fa-times button-icon"></i> بيانات خاطئة';
+                    button.style.background = 'linear-gradient(135deg, #ff006e 0%, #ff6b6b 100%)';
+                    showNotification('اسم المستخدم أو كلمة المرور غير صحيحة');
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.style.background = 'linear-gradient(135deg, var(--galaxy-cyan) 0%, var(--galaxy-pink) 50%, var(--galaxy-cyan) 100%)';
+                    }, 1500);
+                }
+            }, 200);
+        });
+        
+        // إنشاء المجرة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', createGalaxy);
+        
+        // تأثيرات إضافية عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            const container = document.querySelector('.login-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(30px) scale(0.95)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0) scale(1)';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
