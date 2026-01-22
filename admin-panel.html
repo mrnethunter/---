@@ -334,6 +334,9 @@
             margin-bottom: 40px;
             position: relative;
             padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .admin-header::after {
@@ -360,6 +363,30 @@
             color: var(--text-gray);
             font-size: 1.1rem;
             max-width: 600px;
+        }
+        
+        /* Search Box - من الملف الثاني */
+        .search-box {
+            background: rgba(26, 26, 46, 0.7);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: var(--text-light);
+            width: 300px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--galaxy-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 187, 249, 0.1);
+            width: 350px;
+        }
+        
+        .search-box::placeholder {
+            color: rgba(173, 181, 189, 0.7);
         }
         
         /* Stats Cards - تصميم عصري */
@@ -1197,6 +1224,112 @@
             box-shadow: 0 12px 30px rgba(255, 107, 107, 0.5);
         }
 
+        /* Empty State - من الملف الثاني */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--galaxy-pink);
+        }
+        
+        /* Analytics and Settings Sections - من الملف الثاني */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .analytics-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .settings-form {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.5);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+        }
+        
+        .setting-info h4 {
+            color: var(--text-light);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .setting-info p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(157, 78, 221, 0.3);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--galaxy-cyan);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -1210,6 +1343,10 @@
             }
             
             .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .analytics-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -1239,6 +1376,10 @@
             .logout-btn span {
                 display: none;
             }
+            
+            .search-box {
+                width: 200px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -1252,6 +1393,16 @@
             
             .admin-header h1 {
                 font-size: 2rem;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                width: 100%;
             }
         }
         
@@ -1316,6 +1467,8 @@
                 <li><a href="#" data-tab="customers"><i class="fas fa-users"></i> <span>العملاء</span></a></li>
                 <li><a href="#" data-tab="users"><i class="fas fa-user-friends"></i> <span>العملاء المسجلين</span></a></li>
                 <li><a href="#" data-tab="messages"><i class="fas fa-envelope"></i> <span>الرسائل</span></a></li>
+                <li><a href="#" data-tab="analytics"><i class="fas fa-chart-line"></i> <span>التحليلات</span></a></li>
+                <li><a href="#" data-tab="settings"><i class="fas fa-cog"></i> <span>الإعدادات</span></a></li>
             </ul>
             
             <div class="admin-logout">
@@ -1331,8 +1484,11 @@
             <!-- Dashboard Tab -->
             <div id="dashboardTab" class="admin-tab">
                 <div class="admin-header">
-                    <h1>لوحة تحكم نييون ستور</h1>
-                    <p>مرحباً بك في لوحة التحكم المتطورة</p>
+                    <div>
+                        <h1>لوحة تحكم نييون ستور</h1>
+                        <p>مرحباً بك في لوحة التحكم المتطورة</p>
+                    </div>
+                    <input type="text" class="search-box" id="adminSearch" placeholder="ابحث في لوحة التحكم...">
                 </div>
                 
                 <!-- Stats Cards -->
@@ -1399,6 +1555,7 @@
                 <div class="orders-table-container">
                     <div class="table-header">
                         <h3>آخر الطلبات</h3>
+                        <button class="action-btn edit-btn" onclick="switchTab('orders')">عرض الكل</button>
                     </div>
                     <table>
                         <thead>
@@ -1421,8 +1578,11 @@
             <!-- Orders Tab -->
             <div id="ordersTab" class="admin-tab" style="display: none;">
                 <div class="admin-header">
-                    <h1>إدارة الطلبات</h1>
-                    <p>عرض وإدارة جميع طلبات المتجر</p>
+                    <div>
+                        <h1>إدارة الطلبات</h1>
+                        <p>عرض وإدارة جميع طلبات المتجر</p>
+                    </div>
+                    <input type="text" class="search-box" id="ordersSearch" placeholder="ابحث في الطلبات...">
                 </div>
                 
                 <div class="orders-table-container">
@@ -1461,8 +1621,11 @@
             <!-- Products Tab -->
             <div id="productsTab" class="admin-tab" style="display: none;">
                 <div class="admin-header">
-                    <h1>إدارة المنتجات</h1>
-                    <p>إضافة وتعديل وحذف المنتجات</p>
+                    <div>
+                        <h1>إدارة المنتجات</h1>
+                        <p>إضافة وتعديل وحذف المنتجات</p>
+                    </div>
+                    <input type="text" class="search-box" id="productsSearch" placeholder="ابحث في المنتجات...">
                 </div>
                 
                 <div class="products-management">
@@ -1515,7 +1678,18 @@
                     </div>
                     
                     <div class="products-list">
-                        <h3 style="color: var(--galaxy-cyan); margin-bottom: 20px; font-size: 1.3rem; font-weight: 700;">المنتجات الحالية</h3>
+                        <div class="table-header">
+                            <h3 style="color: var(--galaxy-cyan); font-size: 1.3rem; font-weight: 700;">المنتجات الحالية</h3>
+                            <div class="table-filters">
+                                <select class="filter-select" id="productCategoryFilter">
+                                    <option value="all">جميع التصنيفات</option>
+                                    <option value="إلكترونيات">إلكترونيات</option>
+                                    <option value="إكسسوارات">إكسسوارات</option>
+                                    <option value="ألعاب">ألعاب</option>
+                                    <option value="ملابس">ملابس</option>
+                                </select>
+                            </div>
+                        </div>
                         <div id="productsList">
                             <!-- سيتم ملؤها بالبيانات -->
                         </div>
@@ -1526,8 +1700,11 @@
             <!-- Customers Tab -->
             <div id="customersTab" class="admin-tab" style="display: none;">
                 <div class="admin-header">
-                    <h1>إدارة العملاء</h1>
-                    <p>عرض بيانات العملاء من الطلبات</p>
+                    <div>
+                        <h1>إدارة العملاء</h1>
+                        <p>عرض بيانات العملاء من الطلبات</p>
+                    </div>
+                    <input type="text" class="search-box" id="customersSearch" placeholder="ابحث في العملاء...">
                 </div>
                 
                 <div class="orders-table-container">
@@ -1551,8 +1728,11 @@
             <!-- Users Tab (العملاء المسجلين) -->
             <div id="usersTab" class="admin-tab" style="display: none;">
                 <div class="admin-header">
-                    <h1>إدارة العملاء المسجلين</h1>
-                    <p>عرض وإدارة حسابات العملاء المسجلين</p>
+                    <div>
+                        <h1>إدارة العملاء المسجلين</h1>
+                        <p>عرض وإدارة حسابات العملاء المسجلين</p>
+                    </div>
+                    <input type="text" class="search-box" id="usersSearch" placeholder="ابحث في المستخدمين...">
                 </div>
                 
                 <div class="orders-table-container">
@@ -1597,12 +1777,133 @@
             <!-- Messages Tab -->
             <div id="messagesTab" class="admin-tab" style="display: none;">
                 <div class="admin-header">
-                    <h1>رسائل العملاء</h1>
-                    <p>عرض الرسائل الواردة من نموذج الاتصال</p>
+                    <div>
+                        <h1>رسائل العملاء</h1>
+                        <p>عرض الرسائل الواردة من نموذج الاتصال</p>
+                    </div>
+                    <input type="text" class="search-box" id="messagesSearch" placeholder="ابحث في الرسائل...">
                 </div>
                 
                 <div class="messages-section" id="messagesList">
                     <!-- الرسائل ستتم إضافتها عبر JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Analytics Tab (من الملف الثاني) -->
+            <div id="analyticsTab" class="admin-tab" style="display: none;">
+                <div class="admin-header">
+                    <div>
+                        <h1>التحليلات والتقارير</h1>
+                        <p>تقارير وتحليلات مفصلة عن المتجر</p>
+                    </div>
+                </div>
+                
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3 style="color: var(--galaxy-cyan); margin-bottom: 20px; font-size: 1.3rem; font-weight: 700;">أفضل المنتجات مبيعاً</h3>
+                        <div id="topProductsChart">
+                            <div class="empty-state">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>سيتم تفعيل هذا القسم قريباً</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3 style="color: var(--galaxy-cyan); margin-bottom: 20px; font-size: 1.3rem; font-weight: 700;">أنماط الشراء</h3>
+                        <div id="purchasePatterns">
+                            <div class="empty-state">
+                                <i class="fas fa-chart-pie"></i>
+                                <p>سيتم تفعيل هذا القسم قريباً</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h3 style="color: var(--galaxy-cyan); margin-bottom: 20px; font-size: 1.3rem; font-weight: 700;">إحصائيات الأداء</h3>
+                        <div id="performanceStats">
+                            <div class="empty-state">
+                                <i class="fas fa-chart-line"></i>
+                                <p>سيتم تفعيل هذا القسم قريباً</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab (من الملف الثاني) -->
+            <div id="settingsTab" class="admin-tab" style="display: none;">
+                <div class="admin-header">
+                    <div>
+                        <h1>إعدادات المتجر</h1>
+                        <p>إدارة إعدادات وتفضيلات المتجر</p>
+                    </div>
+                </div>
+                
+                <div class="settings-form">
+                    <h3 style="color: var(--galaxy-cyan); margin-bottom: 25px; font-size: 1.5rem; font-weight: 700;">إعدادات عامة</h3>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>تفعيل الإشعارات</h4>
+                            <p>تلقي إشعارات عند استلام طلبات جديدة</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="notificationsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>تفعيل تقارير البريد الإلكتروني</h4>
+                            <p>إرسال تقارير دورية إلى البريد الإلكتروني</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emailReportsToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>وضع الصيانة</h4>
+                            <p>إغلاق المتجر للصيانة المؤقتة</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maintenanceToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>تفعيل نظام التقييمات</h4>
+                            <p>السماح للعملاء بتقييم المنتجات</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="reviewsToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(157, 78, 221, 0.2);">
+                        <h4 style="color: var(--galaxy-cyan); margin-bottom: 15px; font-size: 1.2rem;">إعدادات إضافية</h4>
+                        
+                        <div class="form-group">
+                            <label>البريد الإلكتروني للإشعارات</label>
+                            <input type="email" class="form-control" id="notificationEmail" placeholder="أدخل البريد الإلكتروني">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>رقم هاتف الطوارئ</label>
+                            <input type="tel" class="form-control" id="emergencyPhone" placeholder="أدخل رقم الهاتف">
+                        </div>
+                        
+                        <button class="logout-btn" style="background: linear-gradient(135deg, var(--galaxy-cyan), var(--galaxy-pink)); color: white; width: 100%; margin-top: 20px; font-weight: 700;" onclick="saveSettings()">
+                            <i class="fas fa-save"></i> حفظ الإعدادات
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1764,6 +2065,7 @@
             products: [],
             orders: [],
             messages: [],
+            users: [],
             stats: {
                 totalOrders: 0,
                 totalRevenue: 0,
@@ -1800,6 +2102,27 @@
             const savedMessages = localStorage.getItem('neonStoreContactMessages');
             storeData.messages = savedMessages ? JSON.parse(savedMessages) : [];
             
+            // تحميل المستخدمين
+            const savedUsers = localStorage.getItem('neonStoreUsers');
+            storeData.users = savedUsers ? JSON.parse(savedUsers) : [];
+            
+            // إضافة المستخدم الافتراضي إذا لم يكن موجوداً
+            const defaultUser = {
+                id: 1,
+                name: 'حمزة',
+                email: 'ahmadaiiroot@gmail.com',
+                phone: '0790680891',
+                address: 'عمان، الأردن',
+                registerDate: '2023-01-01',
+                isActive: true,
+                role: 'admin'
+            };
+            
+            if (!storeData.users.some(u => u.email === 'ahmadaiiroot@gmail.com')) {
+                storeData.users.unshift(defaultUser);
+                localStorage.setItem('neonStoreUsers', JSON.stringify(storeData.users));
+            }
+            
             // تحميل الإحصائيات
             const savedStats = localStorage.getItem('neonStoreStats');
             if (savedStats) {
@@ -1817,6 +2140,7 @@
             updateProductsList();
             updateCustomersTable();
             updateMessagesList();
+            updateUsersTable();
         }
         
         // حساب الإحصائيات
@@ -1970,6 +2294,18 @@
             // الحصول على آخر 5 طلبات
             const recentOrders = [...storeData.orders].reverse().slice(0, 5);
             
+            if (recentOrders.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-gray);">
+                            <i class="fas fa-shopping-bag fa-2x" style="margin-bottom: 15px;"></i>
+                            <p>لا توجد طلبات بعد</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
             recentOrders.forEach(order => {
                 const row = document.createElement('tr');
                 
@@ -2036,8 +2372,31 @@
                 filteredOrders = storeData.orders.filter(order => order.status === statusFilter.value);
             }
             
+            // تطبيق البحث إذا كان موجوداً
+            const searchInput = document.getElementById('ordersSearch');
+            if (searchInput && searchInput.value) {
+                const searchTerm = searchInput.value.toLowerCase();
+                filteredOrders = filteredOrders.filter(order => 
+                    order.id.toLowerCase().includes(searchTerm) ||
+                    order.customer.toLowerCase().includes(searchTerm) ||
+                    order.phone.includes(searchTerm)
+                );
+            }
+            
             // ترتيب الطلبات من الأحدث إلى الأقدم
             filteredOrders = [...filteredOrders].reverse();
+            
+            if (filteredOrders.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-gray);">
+                            <i class="fas fa-search fa-2x" style="margin-bottom: 15px;"></i>
+                            <p>لا توجد طلبات مطابقة للبحث</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
             
             filteredOrders.forEach(order => {
                 const row = document.createElement('tr');
@@ -2100,7 +2459,36 @@
             
             productsList.innerHTML = '';
             
-            storeData.products.forEach(product => {
+            let filteredProducts = storeData.products;
+            
+            // تطبيق فلتر التصنيف
+            const categoryFilter = document.getElementById('productCategoryFilter');
+            if (categoryFilter && categoryFilter.value !== 'all') {
+                filteredProducts = storeData.products.filter(product => product.category === categoryFilter.value);
+            }
+            
+            // تطبيق البحث إذا كان موجوداً
+            const searchInput = document.getElementById('productsSearch');
+            if (searchInput && searchInput.value) {
+                const searchTerm = searchInput.value.toLowerCase();
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.description?.toLowerCase().includes(searchTerm) ||
+                    product.category.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (filteredProducts.length === 0) {
+                productsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-gray);">
+                        <i class="fas fa-box fa-2x" style="margin-bottom: 15px;"></i>
+                        <p>لا توجد منتجات مطابقة للبحث</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredProducts.forEach(product => {
                 const productItem = document.createElement('div');
                 productItem.className = 'product-item';
                 
@@ -2165,8 +2553,38 @@
                 }
             });
             
-            // تحويل إلى مصفوفة وعرضها
-            Array.from(customersMap.values()).forEach(customer => {
+            // تحويل إلى مصفوفة
+            const customersArray = Array.from(customersMap.values());
+            
+            // تطبيق البحث إذا كان موجوداً
+            const searchInput = document.getElementById('customersSearch');
+            if (searchInput && searchInput.value) {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredCustomers = customersArray.filter(customer => 
+                    customer.name.toLowerCase().includes(searchTerm) ||
+                    customer.phone.includes(searchTerm)
+                );
+                
+                displayCustomers(filteredCustomers, table);
+            } else {
+                displayCustomers(customersArray, table);
+            }
+        }
+        
+        function displayCustomers(customersArray, table) {
+            if (customersArray.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-gray);">
+                            <i class="fas fa-users fa-2x" style="margin-bottom: 15px;"></i>
+                            <p>لا توجد عملاء مطابقين للبحث</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            customersArray.forEach(customer => {
                 const row = document.createElement('tr');
                 
                 row.innerHTML = `
@@ -2307,19 +2725,33 @@
             
             messagesList.innerHTML = '';
             
-            if (storeData.messages.length === 0) {
+            let filteredMessages = storeData.messages;
+            
+            // تطبيق البحث إذا كان موجوداً
+            const searchInput = document.getElementById('messagesSearch');
+            if (searchInput && searchInput.value) {
+                const searchTerm = searchInput.value.toLowerCase();
+                filteredMessages = storeData.messages.filter(message => 
+                    message.name.toLowerCase().includes(searchTerm) ||
+                    message.email.toLowerCase().includes(searchTerm) ||
+                    message.subject.toLowerCase().includes(searchTerm) ||
+                    message.message.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (filteredMessages.length === 0) {
                 messagesList.innerHTML = `
                     <div style="text-align: center; padding: 60px; color: var(--text-gray);">
-                        <i class="fas fa-envelope" style="font-size: 3.5rem; margin-bottom: 20px; color: var(--galaxy-cyan);"></i>
-                        <h3 style="color: var(--text-light); margin-bottom: 10px;">لا توجد رسائل</h3>
-                        <p>لم يتم استلام أي رسائل من العملاء حتى الآن</p>
+                        <i class="fas fa-envelope fa-3x" style="margin-bottom: 20px; color: var(--galaxy-cyan);"></i>
+                        <h3 style="color: var(--text-light); margin-bottom: 10px;">لا توجد رسائل مطابقة للبحث</h3>
+                        <p>لم يتم العثور على رسائل تطابق البحث</p>
                     </div>
                 `;
                 return;
             }
             
             // ترتيب الرسائل من الأحدث إلى الأقدم
-            const sortedMessages = [...storeData.messages].reverse();
+            const sortedMessages = [...filteredMessages].reverse();
             
             sortedMessages.forEach((message, index) => {
                 const messageItem = document.createElement('div');
@@ -2932,14 +3364,6 @@
             }
         });
         
-        // فلتر الطلبات
-        document.addEventListener('DOMContentLoaded', function() {
-            const statusFilter = document.getElementById('statusFilter');
-            if (statusFilter) {
-                statusFilter.addEventListener('change', updateAllOrders);
-            }
-        });
-        
         // تحديث جدول المستخدمين
         function updateUsersTable() {
             const table = document.getElementById('usersTable');
@@ -2949,40 +3373,23 @@
             
             table.innerHTML = '';
             
-            // تحميل المستخدمين
-            const savedUsers = localStorage.getItem('neonStoreUsers');
-            const allUsers = savedUsers ? JSON.parse(savedUsers) : [];
+            let filteredUsers = storeData.users;
             
-            // تحميل الطلبات لحساب الإحصائيات
-            const savedOrders = localStorage.getItem('neonStoreOrders');
-            const allOrders = savedOrders ? JSON.parse(savedOrders) : [];
-            
-            // حساب إحصائيات لكل مستخدم
-            const usersWithStats = allUsers.map(user => {
-                // حساب عدد الطلبات
-                const userOrders = allOrders.filter(order => 
-                    order.customer === user.name || order.phone === user.phone
-                );
-                
-                // حساب إجمالي المشتريات
-                const totalSpent = userOrders.reduce((total, order) => total + order.amount, 0);
-                
-                return {
-                    ...user,
-                    totalOrders: userOrders.length,
-                    totalSpent: totalSpent,
-                    lastOrder: userOrders.length > 0 
-                        ? userOrders.sort((a, b) => new Date(b.date) - new Date(a.date))[0].date 
-                        : 'لا يوجد'
-                };
-            });
-            
-            // تطبيق الفلتر
-            let filteredUsers = usersWithStats;
-            
+            // تطبيق فلتر الحالة
             if (statusFilter && statusFilter.value !== 'all') {
-                filteredUsers = usersWithStats.filter(user => 
+                filteredUsers = storeData.users.filter(user => 
                     statusFilter.value === 'active' ? user.isActive : !user.isActive
+                );
+            }
+            
+            // تطبيق البحث إذا كان موجوداً
+            const searchInput = document.getElementById('usersSearch');
+            if (searchInput && searchInput.value) {
+                const searchTerm = searchInput.value.toLowerCase();
+                filteredUsers = filteredUsers.filter(user => 
+                    user.name.toLowerCase().includes(searchTerm) ||
+                    user.email.toLowerCase().includes(searchTerm) ||
+                    user.phone.includes(searchTerm)
                 );
             }
             
@@ -2993,9 +3400,22 @@
                         filteredUsers.sort((a, b) => new Date(a.registerDate) - new Date(b.registerDate));
                         break;
                     case 'orders':
+                        // حساب عدد الطلبات لكل مستخدم
+                        filteredUsers.forEach(user => {
+                            user.totalOrders = storeData.orders.filter(order => 
+                                order.customer === user.name || order.phone === user.phone
+                            ).length;
+                        });
                         filteredUsers.sort((a, b) => b.totalOrders - a.totalOrders);
                         break;
                     case 'spent':
+                        // حساب إجمالي المشتريات لكل مستخدم
+                        filteredUsers.forEach(user => {
+                            const userOrders = storeData.orders.filter(order => 
+                                order.customer === user.name || order.phone === user.phone
+                            );
+                            user.totalSpent = userOrders.reduce((total, order) => total + order.amount, 0);
+                        });
                         filteredUsers.sort((a, b) => b.totalSpent - a.totalSpent);
                         break;
                     default: // newest
@@ -3003,9 +3423,31 @@
                 }
             }
             
+            if (filteredUsers.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-gray);">
+                            <i class="fas fa-users fa-2x" style="margin-bottom: 15px;"></i>
+                            <p>لا توجد مستخدمين مطابقين للبحث</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
             // عرض المستخدمين
             filteredUsers.forEach((user, index) => {
                 const row = document.createElement('tr');
+                
+                // حساب إحصائيات المستخدم
+                const userOrders = storeData.orders.filter(order => 
+                    order.customer === user.name || order.phone === user.phone
+                );
+                const totalOrders = userOrders.length;
+                const totalSpent = userOrders.reduce((total, order) => total + order.amount, 0);
+                const lastOrder = userOrders.length > 0 
+                    ? userOrders.sort((a, b) => new Date(b.date) - new Date(a.date))[0].date 
+                    : 'لا يوجد';
                 
                 // تنسيق التاريخ
                 const registerDate = new Date(user.registerDate);
@@ -3033,11 +3475,11 @@
                         ${user.role === 'admin' ? '<span style="color: var(--galaxy-pink); font-size: 0.8rem; margin-right: 5px;"><i class="fas fa-crown"></i> مسؤول</span>' : ''}
                     </td>
                     <td>${user.email}</td>
-                    <td>${user.phone}</td>
+                    <td>${user.phone || 'غير محدد'}</td>
                     <td>${formattedRegisterDate}</td>
                     <td>${formattedLastLogin}</td>
-                    <td>${user.totalOrders}</td>
-                    <td>${user.totalSpent} دينار</td>
+                    <td>${totalOrders}</td>
+                    <td>${totalSpent} دينار</td>
                     <td>
                         <span class="order-status ${user.isActive ? 'status-completed' : 'status-cancelled'}" style="font-size: 0.85rem;">
                             ${user.isActive ? '<i class="fas fa-check-circle"></i> نشط' : '<i class="fas fa-times-circle"></i> غير نشط'}
@@ -3063,22 +3505,14 @@
 
         // عرض طلبات المستخدم
         function viewUserOrders(userId) {
-            // تحميل المستخدم
-            const savedUsers = localStorage.getItem('neonStoreUsers');
-            const users = savedUsers ? JSON.parse(savedUsers) : [];
-            const user = users.find(u => u.id === userId);
-            
+            const user = storeData.users.find(u => u.id === userId);
             if (!user) {
                 showNotification('المستخدم غير موجود', 'error');
                 return;
             }
             
-            // تحميل الطلبات
-            const savedOrders = localStorage.getItem('neonStoreOrders');
-            const allOrders = savedOrders ? JSON.parse(savedOrders) : [];
-            
             // فلترة طلبات المستخدم
-            const userOrders = allOrders.filter(order => 
+            const userOrders = storeData.orders.filter(order => 
                 order.customer === user.name || order.phone === user.phone
             );
             
@@ -3213,10 +3647,7 @@
 
         // حذف المستخدم
         function deleteUser(userId) {
-            // تحميل المستخدم
-            const savedUsers = localStorage.getItem('neonStoreUsers');
-            const users = savedUsers ? JSON.parse(savedUsers) : [];
-            const user = users.find(u => u.id === userId);
+            const user = storeData.users.find(u => u.id === userId);
             
             if (!user) {
                 showNotification('المستخدم غير موجود', 'error');
@@ -3247,7 +3678,7 @@
                             <p><strong><i class="fas fa-envelope"></i> البريد:</strong> ${user.email}</p>
                             <p><strong><i class="fas fa-phone"></i> الهاتف:</strong> ${user.phone}</p>
                             <p><strong><i class="fas fa-calendar"></i> تاريخ التسجيل:</strong> ${new Date(user.registerDate).toLocaleDateString('ar-EG')}</p>
-                            <p><strong><i class="fas fa-shopping-cart"></i> عدد الطلبات:</strong> ${user.totalOrders || 0}</p>
+                            <p><strong><i class="fas fa-shopping-cart"></i> عدد الطلبات:</strong> ${storeData.orders.filter(order => order.customer === user.name || order.phone === user.phone).length}</p>
                         </div>
                         
                         <div class="delete-modal-buttons">
@@ -3307,10 +3738,10 @@
             
             function executeUserDeletion(id) {
                 // إلغاء تنشيط المستخدم
-                const userIndex = users.findIndex(u => u.id === id);
+                const userIndex = storeData.users.findIndex(u => u.id === id);
                 if (userIndex !== -1) {
-                    users[userIndex].isActive = false;
-                    localStorage.setItem('neonStoreUsers', JSON.stringify(users));
+                    storeData.users[userIndex].isActive = false;
+                    localStorage.setItem('neonStoreUsers', JSON.stringify(storeData.users));
                     
                     // تحديث العرض
                     updateUsersTable();
@@ -3323,14 +3754,8 @@
 
         // تصدير بيانات المستخدم
         function exportUserOrders(userId) {
-            // تحميل البيانات
-            const savedUsers = localStorage.getItem('neonStoreUsers');
-            const users = savedUsers ? JSON.parse(savedUsers) : [];
-            const user = users.find(u => u.id === userId);
-            
-            const savedOrders = localStorage.getItem('neonStoreOrders');
-            const allOrders = savedOrders ? JSON.parse(savedOrders) : [];
-            const userOrders = allOrders.filter(order => 
+            const user = storeData.users.find(u => u.id === userId);
+            const userOrders = storeData.orders.filter(order => 
                 order.customer === user.name || order.phone === user.phone
             );
             
@@ -3359,6 +3784,105 @@
             
             showNotification('تم تصدير بيانات العميل', 'success');
         }
+
+        // حفظ الإعدادات
+        function saveSettings() {
+            const notificationEmail = document.getElementById('notificationEmail').value;
+            const emergencyPhone = document.getElementById('emergencyPhone').value;
+            
+            // يمكن حفظ هذه الإعدادات في localStorage
+            const settings = {
+                notificationEmail: notificationEmail,
+                emergencyPhone: emergencyPhone,
+                notifications: document.getElementById('notificationsToggle').checked,
+                emailReports: document.getElementById('emailReportsToggle').checked,
+                maintenance: document.getElementById('maintenanceToggle').checked,
+                reviews: document.getElementById('reviewsToggle').checked
+            };
+            
+            localStorage.setItem('neonStoreSettings', JSON.stringify(settings));
+            showNotification('تم حفظ الإعدادات بنجاح', 'success');
+        }
+
+        // تحميل الإعدادات
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('neonStoreSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                
+                if (document.getElementById('notificationEmail')) {
+                    document.getElementById('notificationEmail').value = settings.notificationEmail || '';
+                }
+                
+                if (document.getElementById('emergencyPhone')) {
+                    document.getElementById('emergencyPhone').value = settings.emergencyPhone || '';
+                }
+                
+                if (document.getElementById('notificationsToggle')) {
+                    document.getElementById('notificationsToggle').checked = settings.notifications || false;
+                }
+                
+                if (document.getElementById('emailReportsToggle')) {
+                    document.getElementById('emailReportsToggle').checked = settings.emailReports || false;
+                }
+                
+                if (document.getElementById('maintenanceToggle')) {
+                    document.getElementById('maintenanceToggle').checked = settings.maintenance || false;
+                }
+                
+                if (document.getElementById('reviewsToggle')) {
+                    document.getElementById('reviewsToggle').checked = settings.reviews || false;
+                }
+            }
+        }
+        
+        // تهيئة البحث
+        function initializeSearch() {
+            const searchInputs = [
+                { id: 'adminSearch', callback: searchDashboard },
+                { id: 'ordersSearch', callback: searchOrders },
+                { id: 'productsSearch', callback: searchProducts },
+                { id: 'customersSearch', callback: searchCustomers },
+                { id: 'usersSearch', callback: searchUsers },
+                { id: 'messagesSearch', callback: searchMessages }
+            ];
+            
+            searchInputs.forEach(input => {
+                const element = document.getElementById(input.id);
+                if (element) {
+                    element.addEventListener('input', function(e) {
+                        input.callback(e.target.value);
+                    });
+                }
+            });
+        }
+        
+        // دوال البحث
+        function searchDashboard(term) {
+            // يمكن تطبيق البحث على لوحة التحكم
+            // حالياً سيبحث في الطلبات الأخيرة
+            updateRecentOrders();
+        }
+        
+        function searchOrders(term) {
+            updateAllOrders();
+        }
+        
+        function searchProducts(term) {
+            updateProductsList();
+        }
+        
+        function searchCustomers(term) {
+            updateCustomersTable();
+        }
+        
+        function searchUsers(term) {
+            updateUsersTable();
+        }
+        
+        function searchMessages(term) {
+            updateMessagesList();
+        }
         
         // تهيئة الصفحة
         document.addEventListener('DOMContentLoaded', function() {
@@ -3370,6 +3894,9 @@
             
             // تحميل البيانات
             loadData();
+            
+            // تحميل الإعدادات
+            loadSettings();
             
             // إضافة أحداث القائمة
             document.querySelectorAll('.admin-menu a').forEach(link => {
@@ -3386,6 +3913,11 @@
                 statusFilter.addEventListener('change', updateAllOrders);
             }
             
+            const categoryFilter = document.getElementById('productCategoryFilter');
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', updateProductsList);
+            }
+            
             // إضافة أحداث فلاتر المستخدمين
             const userStatusFilter = document.getElementById('userStatusFilter');
             const userSort = document.getElementById('userSort');
@@ -3394,6 +3926,9 @@
                 userStatusFilter.addEventListener('change', updateUsersTable);
                 userSort.addEventListener('change', updateUsersTable);
             }
+            
+            // تهيئة البحث
+            initializeSearch();
         });
     </script>
 </body>

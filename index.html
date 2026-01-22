@@ -2093,7 +2093,7 @@
 <div class="header-actions">
     <div class="user-menu">
         <div class="user-avatar" onclick="toggleUserMenu()">
-            <img src="h9zi.jpeg" alt="صورة المستخدم">
+            <img src="" alt="صورة المستخدم">
         </div>
         <div class="dropdown-menu" id="userDropdown">
             <a href="#account" class="dropdown-item" onclick="showSection('account'); hideUserMenu()">
@@ -2433,7 +2433,7 @@
             <div class="account-card">
                 <div class="account-info">
                     <div class="account-avatar">
-                        <img src="h9zi.jpeg" alt="صورة المستخدم">
+                        <img src="" alt="صورة المستخدم">
                     </div>
                     <div class="account-details">
                         <h2>مرحباً، <span id="userDisplayName">حمزة</span>!</h2>
@@ -3007,12 +3007,121 @@
         }
 
         // إزالة منتج من السلة
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            saveCart();
-            updateCartDisplay();
-            showNotification('تم إزالة المنتج من السلة', 'success');
+      // === إصلاح دالة removeFromCart ===
+function removeFromCart(productId) {
+    // البحث عن المنتج في السلة
+    const itemIndex = cart.findIndex(item => item.id === productId);
+    
+    if (itemIndex !== -1) {
+        // إزالة المنتج من السلة
+        cart.splice(itemIndex, 1);
+        
+        // حفظ التغييرات
+        saveCart();
+        
+        // تحديث العرض
+        updateCartDisplay();
+        
+        // إشعار المستخدم
+        showNotification('تم إزالة المنتج من السلة', 'success');
+        
+        // إغلاق السلة إذا كانت فارغة
+        if (cart.length === 0) {
+            setTimeout(() => {
+                toggleCart();
+            }, 1000);
         }
+    } else {
+        showNotification('المنتج غير موجود في السلة', 'error');
+    }
+}
+
+// === إصلاح دالة updateCartDisplay لضمان عمل أزرار الحذف ===
+function updateCartDisplay() {
+    const cartItems = document.getElementById('cartItems');
+    const cartTotal = document.getElementById('cartTotal');
+    const cartCount = document.querySelector('.cart-count');
+    
+    if (!cartItems || !cartTotal || !cartCount) return;
+
+    cartItems.innerHTML = '';
+    let total = 0;
+    let totalCount = 0;
+
+    if (cart.length === 0) {
+        cartItems.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-gray);">
+                <i class="fas fa-shopping-cart fa-3x" style="margin-bottom: 20px;"></i>
+                <h3>سلة التسوق فارغة</h3>
+                <p>أضف منتجات إلى السلة لتبدأ التسوق</p>
+            </div>
+        `;
+    } else {
+        cart.forEach(item => {
+            total += item.price * item.quantity;
+            totalCount += item.quantity;
+
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+
+            cartItem.innerHTML = `
+                <div class="cart-item-image">
+                    <img src="${item.image || 'https://via.placeholder.com/70x70/16213e/ffffff?text=Product'}" alt="${item.name}" loading="lazy">
+                </div>
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.name}</div>
+                    <div class="cart-item-price">${item.price} دينار</div>
+                    <div class="cart-item-actions">
+                        <button class="quantity-btn decrease" data-id="${item.id}">-</button>
+                        <span class="item-quantity">${item.quantity}</span>
+                        <button class="quantity-btn increase" data-id="${item.id}">+</button>
+                        <button class="remove-item" data-id="${item.id}">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            cartItems.appendChild(cartItem);
+        });
+    }
+
+    cartTotal.textContent = `${total} دينار`;
+    cartCount.textContent = totalCount;
+
+    // إعادة ربط الأحداث بعد تحديث السلة
+    setTimeout(() => {
+        bindCartEvents();
+    }, 100);
+}
+
+// === دالة جديدة لربط أحداث السلة ===
+function bindCartEvents() {
+    // أزرار تقليل الكمية
+    document.querySelectorAll('.decrease').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = parseInt(this.getAttribute('data-id'));
+            decreaseQuantity(productId);
+        });
+    });
+
+    // أزرار زيادة الكمية
+    document.querySelectorAll('.increase').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = parseInt(this.getAttribute('data-id'));
+            increaseQuantity(productId);
+        });
+    });
+
+    // أزرار حذف المنتج
+    document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = parseInt(this.getAttribute('data-id'));
+            removeFromCart(productId);
+        });
+    });
+}
+        
 
         // فتح نموذج إتمام الطلب
         function openCheckoutForm() {
@@ -3576,12 +3685,29 @@ function clearWishlist() {
 }
 
 // ========== نظام الطلبات ==========
+// === دالة محسنة لتحميل الطلبات ===
 function loadUserOrders() {
     const ordersList = document.getElementById('ordersList');
     if (!ordersList) return;
     
+    const currentUser = AuthSystem.getCurrentUser();
+    if (!currentUser) {
+        ordersList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle fa-3x"></i>
+                <h3>يرجى تسجيل الدخول</h3>
+                <p>يجب تسجيل الدخول لعرض الطلبات</p>
+                <button class="cta-button" onclick="window.location.href='login.html'">تسجيل الدخول</button>
+            </div>
+        `;
+        return;
+    }
+    
+    // فلترة الطلبات حسب المستخدم الحالي
     const userOrders = store.orders.filter(order => 
-        order.customer === currentUser.name || order.phone === currentUser.phone
+        order.customer.toLowerCase().includes(currentUser.name.toLowerCase()) ||
+        order.phone === currentUser.phone ||
+        order.email === currentUser.email
     );
     
     if (userOrders.length === 0) {
@@ -3595,8 +3721,6 @@ function loadUserOrders() {
         `;
         return;
     }
-    
-    ordersList.innerHTML = '';
     
     // فلتر الطلبات
     const filter = document.querySelector('.filter-btn.active')?.getAttribute('data-filter') || 'all';
@@ -3612,10 +3736,13 @@ function loadUserOrders() {
                 <i class="fas fa-filter fa-3x"></i>
                 <h3>لا توجد طلبات</h3>
                 <p>لا توجد طلبات تطابق الفلتر المحدد</p>
+                <button class="cta-button" onclick="document.querySelector('.filter-btn[data-filter=\"all\"]').click()">عرض الكل</button>
             </div>
         `;
         return;
     }
+    
+    ordersList.innerHTML = '';
     
     // عرض الطلبات
     filteredOrders.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time))
@@ -3637,21 +3764,24 @@ function loadUserOrders() {
             statusText = 'ملغاة';
         }
         
-        const productsHTML = order.products.map(product => `
-            <div class="order-product">
-                <div class="order-product-image">
-                    <img src="${store.products.find(p => p.id === product.id)?.image || ''}" alt="${product.name}">
-                </div>
-                <div class="order-product-info">
-                    <div class="order-product-name">${product.name}</div>
-                    <div class="order-product-details">
-                        <span>الكمية: ${product.quantity}</span>
-                        <span>السعر: ${product.price} دينار</span>
-                        <span>المجموع: ${product.price * product.quantity} دينار</span>
+        const productsHTML = order.products.map(product => {
+            const productData = store.products.find(p => p.id === product.id);
+            return `
+                <div class="order-product">
+                    <div class="order-product-image">
+                        <img src="${productData?.image || 'https://via.placeholder.com/50x50/16213e/ffffff?text=P'}" alt="${product.name}" loading="lazy">
+                    </div>
+                    <div class="order-product-info">
+                        <div class="order-product-name">${product.name}</div>
+                        <div class="order-product-details">
+                            <span>الكمية: ${product.quantity}</span>
+                            <span>السعر: ${product.price} دينار</span>
+                            <span>المجموع: ${product.price * product.quantity} دينار</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         
         orderItem.innerHTML = `
             <div class="order-header">
@@ -3669,7 +3799,7 @@ function loadUserOrders() {
             <div class="order-footer">
                 <div>
                     <span>طريقة الدفع: </span>
-                    <strong>${order.paymentMethod === 'cash' ? 'الدفع عند الاستلام' : 'التواصل'}</strong>
+                    <strong>${order.paymentMethod === 'cash' ? 'الدفع عند الاستلام' : 'التواصل عبر H9ZI'}</strong>
                 </div>
                 <div class="order-total">الإجمالي: ${order.amount} دينار</div>
             </div>
@@ -3678,6 +3808,26 @@ function loadUserOrders() {
         ordersList.appendChild(orderItem);
     });
 }
+
+// === إضافة أحداث لأزرار الفلتر ===
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة أحداث لأزرار الفلتر
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('filter-btn')) {
+            // إزالة النشاط من جميع الأزرار
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // إضافة النشاط للزر المحدد
+            e.target.classList.add('active');
+            
+            // تحميل الطلبات مع الفلتر الجديد
+            loadUserOrders();
+        }
+    });
+});
+
 
 // ========== تحديث إحصائيات الحساب ==========
 function updateAccountStats() {
@@ -3868,7 +4018,7 @@ const AuthSystem = {
                     email: "ahmadaiiroot@gmail.com",
                     phone: "0790680891",
                     address: "عمان، الأردن",
-                    avatar: "h9zi.jpeg",
+                    avatar: "",
                     memberSince: "2023"
                 }
             };
@@ -4192,7 +4342,7 @@ function initializeUserSystem() {
         const userAvatar = document.getElementById('userAvatar');
         const navAvatar = document.querySelector('.user-avatar img');
         
-        if (currentUser.avatar && currentUser.avatar !== 'default-avatar.jpg' && currentUser.avatar !== 'h9zi.jpeg') {
+        if (currentUser.avatar && currentUser.avatar !== 'default-avatar.jpg' && currentUser.avatar !== '') {
             userAvatar.src = currentUser.avatar;
             navAvatar.src = currentUser.avatar;
         }
