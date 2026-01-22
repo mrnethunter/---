@@ -1314,6 +1314,7 @@
                 <li><a href="#" data-tab="orders"><i class="fas fa-shopping-bag"></i> <span>الطلبات</span></a></li>
                 <li><a href="#" data-tab="products"><i class="fas fa-box"></i> <span>المنتجات</span></a></li>
                 <li><a href="#" data-tab="customers"><i class="fas fa-users"></i> <span>العملاء</span></a></li>
+                <li><a href="#" data-tab="users"><i class="fas fa-user-friends"></i> <span>العملاء المسجلين</span></a></li>
                 <li><a href="#" data-tab="messages"><i class="fas fa-envelope"></i> <span>الرسائل</span></a></li>
             </ul>
             
@@ -1473,8 +1474,8 @@
                                 <input type="text" id="productName" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label for="productDescription">وصف المنتج</label>
-                                <textarea id="productDescription" class="form-control" rows="3" required></textarea>
+                                <label for="productDeion">وصف المنتج</label>
+                                <textarea id="productDeion" class="form-control" rows="3" required></textarea>
                             </div>
                             <div class="form-group">
                                 <label for="productPrice">السعر (دينار)</label>
@@ -1526,7 +1527,7 @@
             <div id="customersTab" class="admin-tab" style="display: none;">
                 <div class="admin-header">
                     <h1>إدارة العملاء</h1>
-                    <p>عرض بيانات العملاء</p>
+                    <p>عرض بيانات العملاء من الطلبات</p>
                 </div>
                 
                 <div class="orders-table-container">
@@ -1541,6 +1542,52 @@
                             </tr>
                         </thead>
                         <tbody id="customersTable">
+                            <!-- سيتم ملؤها بالبيانات -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users Tab (العملاء المسجلين) -->
+            <div id="usersTab" class="admin-tab" style="display: none;">
+                <div class="admin-header">
+                    <h1>إدارة العملاء المسجلين</h1>
+                    <p>عرض وإدارة حسابات العملاء المسجلين</p>
+                </div>
+                
+                <div class="orders-table-container">
+                    <div class="table-header">
+                        <h3>العملاء المسجلين</h3>
+                        <div class="table-filters">
+                            <select class="filter-select" id="userStatusFilter">
+                                <option value="all">جميع العملاء</option>
+                                <option value="active">نشط</option>
+                                <option value="inactive">غير نشط</option>
+                            </select>
+                            <select class="filter-select" id="userSort">
+                                <option value="newest">الأحدث</option>
+                                <option value="oldest">الأقدم</option>
+                                <option value="orders">الأكثر طلبات</option>
+                                <option value="spent">الأكثر إنفاقاً</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الاسم</th>
+                                <th>البريد</th>
+                                <th>الهاتف</th>
+                                <th>تاريخ التسجيل</th>
+                                <th>آخر دخول</th>
+                                <th>عدد الطلبات</th>
+                                <th>إجمالي المشتريات</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
                             <!-- سيتم ملؤها بالبيانات -->
                         </tbody>
                     </table>
@@ -1564,7 +1611,6 @@
     <!-- Notification Container -->
     <div class="notification-container" id="notificationContainer"></div>
     
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script>
         // إنشاء النجوم الطائرة المحسنة
@@ -2521,77 +2567,87 @@
         }
         
         // معاينة الصورة قبل الرفع
-        document.getElementById('productImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            // عرض اسم الملف
-            document.getElementById('fileName').textContent = file.name;
-            
-            // معاينة الصورة
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewContainer = document.getElementById('imagePreviewContainer');
-                const preview = document.getElementById('imagePreview');
-                
-                preview.src = e.target.result;
-                previewContainer.style.display = 'block';
-                previewContainer.style.animation = 'fadeIn 0.5s ease';
-            };
-            reader.readAsDataURL(file);
+        document.addEventListener('DOMContentLoaded', function() {
+            const productImageInput = document.getElementById('productImage');
+            if (productImageInput) {
+                productImageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    // عرض اسم الملف
+                    document.getElementById('fileName').textContent = file.name;
+                    
+                    // معاينة الصورة
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewContainer = document.getElementById('imagePreviewContainer');
+                        const preview = document.getElementById('imagePreview');
+                        
+                        preview.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                        previewContainer.style.animation = 'fadeIn 0.5s ease';
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
         });
         
         // إضافة منتج جديد
-        document.getElementById('addProductForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('productName').value;
-            const description = document.getElementById('productDescription').value;
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const stock = parseInt(document.getElementById('productStock').value);
-            const category = document.getElementById('productCategory').value;
-            const imageFile = document.getElementById('productImage').files[0];
-            
-            if (!name || !description || !price || !stock || !category) {
-                showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
-                return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const addProductForm = document.getElementById('addProductForm');
+            if (addProductForm) {
+                addProductForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('productName').value;
+                    const deion = document.getElementById('productDeion').value;
+                    const price = parseFloat(document.getElementById('productPrice').value);
+                    const stock = parseInt(document.getElementById('productStock').value);
+                    const category = document.getElementById('productCategory').value;
+                    const imageFile = document.getElementById('productImage').files[0];
+                    
+                    if (!name || !deion || !price || !stock || !category) {
+                        showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+                        return;
+                    }
+                    
+                    if (!imageFile) {
+                        showNotification('يرجى اختيار صورة للمنتج', 'error');
+                        return;
+                    }
+                    
+                    // تحويل الصورة إلى base64
+                    convertImageToBase64(imageFile, function(base64Image) {
+                        const newProduct = {
+                            id: storeData.products.length > 0 ? Math.max(...storeData.products.map(p => p.id)) + 1 : 1,
+                            name: name,
+                            deion: deion,
+                            price: price,
+                            stock: stock,
+                            category: category,
+                            image: base64Image,
+                            icon: 'fas fa-box'
+                        };
+                        
+                        storeData.products.push(newProduct);
+                        
+                        // حفظ التغييرات
+                        localStorage.setItem('neonStoreProducts', JSON.stringify(storeData.products));
+                        
+                        // تحديث العرض
+                        updateProductsList();
+                        calculateStats();
+                        updateStatsDisplay();
+                        
+                        // مسح النموذج
+                        document.getElementById('addProductForm').reset();
+                        document.getElementById('fileName').textContent = 'اختر صورة من جهازك';
+                        document.getElementById('imagePreviewContainer').style.display = 'none';
+                        
+                        showNotification('تم إضافة المنتج بنجاح', 'success');
+                    });
+                });
             }
-            
-            if (!imageFile) {
-                showNotification('يرجى اختيار صورة للمنتج', 'error');
-                return;
-            }
-            
-            // تحويل الصورة إلى base64
-            convertImageToBase64(imageFile, function(base64Image) {
-                const newProduct = {
-                    id: storeData.products.length > 0 ? Math.max(...storeData.products.map(p => p.id)) + 1 : 1,
-                    name: name,
-                    description: description,
-                    price: price,
-                    stock: stock,
-                    category: category,
-                    image: base64Image,
-                    icon: 'fas fa-box'
-                };
-                
-                storeData.products.push(newProduct);
-                
-                // حفظ التغييرات
-                localStorage.setItem('neonStoreProducts', JSON.stringify(storeData.products));
-                
-                // تحديث العرض
-                updateProductsList();
-                calculateStats();
-                updateStatsDisplay();
-                
-                // مسح النموذج
-                document.getElementById('addProductForm').reset();
-                document.getElementById('fileName').textContent = 'اختر صورة من جهازك';
-                document.getElementById('imagePreviewContainer').style.display = 'none';
-                
-                showNotification('تم إضافة المنتج بنجاح', 'success');
-            });
         });
         
         // تعديل منتج
@@ -2830,33 +2886,479 @@
             
             // إظهار التبويب المحدد
             const targetTab = document.getElementById(tabName + 'Tab');
-            targetTab.style.display = 'block';
-            
-            // إضافة تأثير الظهور
-            targetTab.style.animation = 'fadeIn 0.5s ease';
-            
-            // تحديث حالة القائمة
-            document.querySelectorAll('.admin-menu a').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            document.querySelector(`.admin-menu a[data-tab="${tabName}"]`).classList.add('active');
-            
-            // تحديث محتوى التبويب
-            if (tabName === 'messages') {
-                updateMessagesList();
+            if (targetTab) {
+                targetTab.style.display = 'block';
+                
+                // إضافة تأثير الظهور
+                targetTab.style.animation = 'fadeIn 0.5s ease';
+                
+                // تحديث حالة القائمة
+                document.querySelectorAll('.admin-menu a').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                const menuLink = document.querySelector(`.admin-menu a[data-tab="${tabName}"]`);
+                if (menuLink) {
+                    menuLink.classList.add('active');
+                }
+                
+                // تحديث محتوى التبويب بناءً على النوع
+                if (tabName === 'messages') {
+                    updateMessagesList();
+                } else if (tabName === 'users') {
+                    updateUsersTable();
+                } else if (tabName === 'orders') {
+                    updateAllOrders();
+                } else if (tabName === 'products') {
+                    updateProductsList();
+                } else if (tabName === 'customers') {
+                    updateCustomersTable();
+                } else if (tabName === 'dashboard') {
+                    updateRecentOrders();
+                    updateCharts();
+                }
             }
         }
         
         // تسجيل الخروج
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            localStorage.removeItem('neonStoreAdminLoggedIn');
-            localStorage.removeItem('neonStoreAdminLoginTime');
-            window.location.href = 'admin-login.html';
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('neonStoreAdminLoggedIn');
+                    localStorage.removeItem('neonStoreAdminLoginTime');
+                    window.location.href = 'admin-login.html';
+                });
+            }
         });
         
         // فلتر الطلبات
-        document.getElementById('statusFilter').addEventListener('change', updateAllOrders);
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', updateAllOrders);
+            }
+        });
+        
+        // تحديث جدول المستخدمين
+        function updateUsersTable() {
+            const table = document.getElementById('usersTable');
+            const statusFilter = document.getElementById('userStatusFilter');
+            const sortFilter = document.getElementById('userSort');
+            if (!table) return;
+            
+            table.innerHTML = '';
+            
+            // تحميل المستخدمين
+            const savedUsers = localStorage.getItem('neonStoreUsers');
+            const allUsers = savedUsers ? JSON.parse(savedUsers) : [];
+            
+            // تحميل الطلبات لحساب الإحصائيات
+            const savedOrders = localStorage.getItem('neonStoreOrders');
+            const allOrders = savedOrders ? JSON.parse(savedOrders) : [];
+            
+            // حساب إحصائيات لكل مستخدم
+            const usersWithStats = allUsers.map(user => {
+                // حساب عدد الطلبات
+                const userOrders = allOrders.filter(order => 
+                    order.customer === user.name || order.phone === user.phone
+                );
+                
+                // حساب إجمالي المشتريات
+                const totalSpent = userOrders.reduce((total, order) => total + order.amount, 0);
+                
+                return {
+                    ...user,
+                    totalOrders: userOrders.length,
+                    totalSpent: totalSpent,
+                    lastOrder: userOrders.length > 0 
+                        ? userOrders.sort((a, b) => new Date(b.date) - new Date(a.date))[0].date 
+                        : 'لا يوجد'
+                };
+            });
+            
+            // تطبيق الفلتر
+            let filteredUsers = usersWithStats;
+            
+            if (statusFilter && statusFilter.value !== 'all') {
+                filteredUsers = usersWithStats.filter(user => 
+                    statusFilter.value === 'active' ? user.isActive : !user.isActive
+                );
+            }
+            
+            // تطبيق الترتيب
+            if (sortFilter) {
+                switch(sortFilter.value) {
+                    case 'oldest':
+                        filteredUsers.sort((a, b) => new Date(a.registerDate) - new Date(b.registerDate));
+                        break;
+                    case 'orders':
+                        filteredUsers.sort((a, b) => b.totalOrders - a.totalOrders);
+                        break;
+                    case 'spent':
+                        filteredUsers.sort((a, b) => b.totalSpent - a.totalSpent);
+                        break;
+                    default: // newest
+                        filteredUsers.sort((a, b) => new Date(b.registerDate) - new Date(a.registerDate));
+                }
+            }
+            
+            // عرض المستخدمين
+            filteredUsers.forEach((user, index) => {
+                const row = document.createElement('tr');
+                
+                // تنسيق التاريخ
+                const registerDate = new Date(user.registerDate);
+                const formattedRegisterDate = registerDate.toLocaleDateString('ar-EG', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                const lastLogin = user.lastLogin ? new Date(user.lastLogin) : null;
+                const formattedLastLogin = lastLogin 
+                    ? lastLogin.toLocaleDateString('ar-EG', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                    : 'لم يسجل دخول';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>
+                        <strong>${user.name}</strong>
+                        ${user.role === 'admin' ? '<span style="color: var(--galaxy-pink); font-size: 0.8rem; margin-right: 5px;"><i class="fas fa-crown"></i> مسؤول</span>' : ''}
+                    </td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>${formattedRegisterDate}</td>
+                    <td>${formattedLastLogin}</td>
+                    <td>${user.totalOrders}</td>
+                    <td>${user.totalSpent} دينار</td>
+                    <td>
+                        <span class="order-status ${user.isActive ? 'status-completed' : 'status-cancelled'}" style="font-size: 0.85rem;">
+                            ${user.isActive ? '<i class="fas fa-check-circle"></i> نشط' : '<i class="fas fa-times-circle"></i> غير نشط'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="viewUserOrders(${user.id})">
+                                <i class="fas fa-eye"></i> عرض الطلبات
+                            </button>
+                            ${user.role !== 'admin' ? `
+                                <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                
+                table.appendChild(row);
+            });
+        }
+
+        // عرض طلبات المستخدم
+        function viewUserOrders(userId) {
+            // تحميل المستخدم
+            const savedUsers = localStorage.getItem('neonStoreUsers');
+            const users = savedUsers ? JSON.parse(savedUsers) : [];
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) {
+                showNotification('المستخدم غير موجود', 'error');
+                return;
+            }
+            
+            // تحميل الطلبات
+            const savedOrders = localStorage.getItem('neonStoreOrders');
+            const allOrders = savedOrders ? JSON.parse(savedOrders) : [];
+            
+            // فلترة طلبات المستخدم
+            const userOrders = allOrders.filter(order => 
+                order.customer === user.name || order.phone === user.phone
+            );
+            
+            // إنشاء نافذة عرض الطلبات
+            const ordersModal = `
+                <div class="delete-modal-overlay" id="userOrdersModal">
+                    <div class="delete-modal" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+                        <div class="delete-icon" style="background: linear-gradient(135deg, var(--galaxy-cyan), var(--galaxy-blue));">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <h2 class="delete-title">طلبات ${user.name}</h2>
+                        <p class="delete-message">
+                            عرض جميع طلبات العميل
+                        </p>
+                        
+                        <div class="product-info-delete">
+                            <h4>معلومات العميل</h4>
+                            <p><strong><i class="fas fa-user"></i> الاسم:</strong> ${user.name}</p>
+                            <p><strong><i class="fas fa-phone"></i> الهاتف:</strong> ${user.phone}</p>
+                            <p><strong><i class="fas fa-envelope"></i> البريد:</strong> ${user.email}</p>
+                            <p><strong><i class="fas fa-calculator"></i> إجمالي الطلبات:</strong> ${userOrders.length}</p>
+                            <p><strong><i class="fas fa-money-bill"></i> إجمالي المشتريات:</strong> ${userOrders.reduce((total, order) => total + order.amount, 0)} دينار</p>
+                        </div>
+                        
+                        <div style="margin: 30px 0;">
+                            <h4 style="color: var(--galaxy-cyan); margin-bottom: 20px; font-size: 1.3rem;">
+                                <i class="fas fa-list"></i> تفاصيل الطلبات
+                            </h4>
+                            
+                            <div id="userOrdersList" style="max-height: 300px; overflow-y: auto;">
+                                ${userOrders.length === 0 ? 
+                                    '<p style="text-align: center; color: var(--text-gray); padding: 20px;"><i class="fas fa-inbox"></i> لا توجد طلبات</p>' : 
+                                    generateUserOrdersHTML(userOrders)
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="delete-modal-buttons">
+                            <button class="modal-btn modal-btn-cancel" id="closeUserOrdersModal">
+                                <i class="fas fa-times"></i>
+                                إغلاق
+                            </button>
+                            <button class="modal-btn" onclick="exportUserOrders(${user.id})" style="background: linear-gradient(135deg, var(--galaxy-green), var(--galaxy-cyan)); color: white;">
+                                <i class="fas fa-download"></i>
+                                تصدير البيانات
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.innerHTML = ordersModal;
+            document.body.appendChild(modalContainer);
+            
+            setTimeout(() => {
+                document.getElementById('userOrdersModal').classList.add('show');
+            }, 10);
+            
+            document.getElementById('closeUserOrdersModal').addEventListener('click', function() {
+                closeUserOrdersModal();
+            });
+            
+            document.getElementById('userOrdersModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeUserOrdersModal();
+                }
+            });
+            
+            function closeUserOrdersModal() {
+                const modal = document.getElementById('userOrdersModal');
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.parentNode.remove();
+                    }
+                }, 300);
+            }
+        }
+
+        // إنشاء HTML لطلبات المستخدم
+        function generateUserOrdersHTML(orders) {
+            let html = '';
+            
+            // ترتيب الطلبات من الأحدث للأقدم
+            orders.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+            
+            orders.forEach((order, index) => {
+                const statusClass = getStatusClass(order.status);
+                const statusText = getStatusText(order.status);
+                
+                html += `
+                    <div style="background: rgba(26, 26, 46, 0.5); border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid rgba(157, 78, 221, 0.2);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>
+                                <strong style="color: var(--galaxy-cyan);">طلب #${order.id}</strong>
+                                <span style="color: var(--text-gray); font-size: 0.9rem; margin-right: 10px;">${order.date} ${order.time}</span>
+                            </div>
+                            <span class="order-status ${statusClass}" style="font-size: 0.8rem; padding: 4px 10px;">
+                                ${statusText}
+                            </span>
+                        </div>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <strong><i class="fas fa-map-marker-alt"></i> العنوان:</strong>
+                            <span style="color: var(--text-gray); font-size: 0.9rem;"> ${order.address}</span>
+                        </div>
+                        
+                        <div style="margin-bottom: 10px;">
+                            <strong><i class="fas fa-credit-card"></i> طريقة الدفع:</strong>
+                            <span style="color: var(--text-gray);"> ${order.paymentMethod === 'cash' ? 'الدفع عند الاستلام' : 'التواصل'}</span>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid rgba(157, 78, 221, 0.1);">
+                            <div>
+                                <strong style="color: var(--galaxy-green); font-size: 1.1rem;">${order.amount} دينار</strong>
+                            </div>
+                            <div>
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">
+                                    ${order.products.length} منتج${order.products.length > 1 ? 'ات' : ''}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        ${index < orders.length - 1 ? '<hr style="border-color: rgba(157, 78, 221, 0.1); margin: 15px 0;">' : ''}
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+
+        // حذف المستخدم
+        function deleteUser(userId) {
+            // تحميل المستخدم
+            const savedUsers = localStorage.getItem('neonStoreUsers');
+            const users = savedUsers ? JSON.parse(savedUsers) : [];
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) {
+                showNotification('المستخدم غير موجود', 'error');
+                return;
+            }
+            
+            // لا يمكن حذف المسؤول
+            if (user.role === 'admin') {
+                showNotification('لا يمكن حذف حساب المسؤول', 'error');
+                return;
+            }
+            
+            // إنشاء نافذة التأكيد
+            const deleteModalHTML = `
+                <div class="delete-modal-overlay" id="deleteUserModal">
+                    <div class="delete-modal">
+                        <div class="delete-icon" style="background: linear-gradient(135deg, var(--galaxy-pink), var(--galaxy-purple));">
+                            <i class="fas fa-user-slash"></i>
+                        </div>
+                        <h2 class="delete-title">حذف العميل</h2>
+                        <p class="delete-message">
+                            هل تريد حذف حساب هذا العميل؟<br>
+                            سيتم إلغاء تنشيط الحساب وليس حذفه نهائياً
+                        </p>
+                        
+                        <div class="product-info-delete">
+                            <h4>${user.name}</h4>
+                            <p><strong><i class="fas fa-envelope"></i> البريد:</strong> ${user.email}</p>
+                            <p><strong><i class="fas fa-phone"></i> الهاتف:</strong> ${user.phone}</p>
+                            <p><strong><i class="fas fa-calendar"></i> تاريخ التسجيل:</strong> ${new Date(user.registerDate).toLocaleDateString('ar-EG')}</p>
+                            <p><strong><i class="fas fa-shopping-cart"></i> عدد الطلبات:</strong> ${user.totalOrders || 0}</p>
+                        </div>
+                        
+                        <div class="delete-modal-buttons">
+                            <button class="modal-btn modal-btn-cancel" id="cancelDeleteUser">
+                                <i class="fas fa-times"></i>
+                                إلغاء
+                            </button>
+                            <button class="modal-btn modal-btn-delete" id="confirmDeleteUser">
+                                <i class="fas fa-trash"></i>
+                                حذف العميل
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const modalContainer = document.createElement('div');
+            modalContainer.innerHTML = deleteModalHTML;
+            document.body.appendChild(modalContainer);
+            
+            setTimeout(() => {
+                document.getElementById('deleteUserModal').classList.add('show');
+            }, 10);
+            
+            document.getElementById('cancelDeleteUser').addEventListener('click', function() {
+                closeDeleteUserModal();
+            });
+            
+            document.getElementById('confirmDeleteUser').addEventListener('click', function() {
+                executeUserDeletion(userId);
+            });
+            
+            document.getElementById('deleteUserModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDeleteUserModal();
+                }
+            });
+            
+            const handleEscape = function(e) {
+                if (e.key === 'Escape') {
+                    closeDeleteUserModal();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+            
+            function closeDeleteUserModal() {
+                const modal = document.getElementById('deleteUserModal');
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.parentNode.remove();
+                    }
+                    document.removeEventListener('keydown', handleEscape);
+                }, 300);
+            }
+            
+            function executeUserDeletion(id) {
+                // إلغاء تنشيط المستخدم
+                const userIndex = users.findIndex(u => u.id === id);
+                if (userIndex !== -1) {
+                    users[userIndex].isActive = false;
+                    localStorage.setItem('neonStoreUsers', JSON.stringify(users));
+                    
+                    // تحديث العرض
+                    updateUsersTable();
+                    closeDeleteUserModal();
+                    
+                    showNotification('تم حذف العميل بنجاح', 'success');
+                }
+            }
+        }
+
+        // تصدير بيانات المستخدم
+        function exportUserOrders(userId) {
+            // تحميل البيانات
+            const savedUsers = localStorage.getItem('neonStoreUsers');
+            const users = savedUsers ? JSON.parse(savedUsers) : [];
+            const user = users.find(u => u.id === userId);
+            
+            const savedOrders = localStorage.getItem('neonStoreOrders');
+            const allOrders = savedOrders ? JSON.parse(savedOrders) : [];
+            const userOrders = allOrders.filter(order => 
+                order.customer === user.name || order.phone === user.phone
+            );
+            
+            // إنشاء بيانات للتصدير
+            const exportData = {
+                user: user,
+                orders: userOrders,
+                summary: {
+                    totalOrders: userOrders.length,
+                    totalSpent: userOrders.reduce((total, order) => total + order.amount, 0),
+                    averageOrder: userOrders.length > 0 ? (userOrders.reduce((total, order) => total + order.amount, 0) / userOrders.length).toFixed(2) : 0
+                }
+            };
+            
+            // تحويل إلى نص
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            // إنشاء رابط تحميل
+            const exportFileDefaultName = `user_${user.name}_orders_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('تم تصدير بيانات العميل', 'success');
+        }
         
         // تهيئة الصفحة
         document.addEventListener('DOMContentLoaded', function() {
@@ -2877,6 +3379,21 @@
                     switchTab(tabName);
                 });
             });
+            
+            // إضافة أحداث الفلاتر
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', updateAllOrders);
+            }
+            
+            // إضافة أحداث فلاتر المستخدمين
+            const userStatusFilter = document.getElementById('userStatusFilter');
+            const userSort = document.getElementById('userSort');
+            
+            if (userStatusFilter && userSort) {
+                userStatusFilter.addEventListener('change', updateUsersTable);
+                userSort.addEventListener('change', updateUsersTable);
+            }
         });
     </script>
 </body>

@@ -2066,6 +2066,7 @@
         .page-section.active {
             display: block;
         }
+    
     </style>
 </head>
 <body>
@@ -2084,6 +2085,10 @@
         <li><a href="#contact" class="nav-link" data-section="contact">اتصل بنا</a></li>
     </ul>
 </nav>
+<div class="auth-links">
+    <a href="login.html" class="auth-link" id="loginLink">تسجيل الدخول</a>
+    <a href="register.html" class="auth-link register" id="registerLink">إنشاء حساب</a>
+</div>
 
 <div class="header-actions">
     <div class="user-menu">
@@ -3418,10 +3423,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
     </script>
     <!-- بعد الـ script الحالي -->
-<script src="search-system.js"></script>
-<script src="categories-filter.js"></script>
-<script src="ratings-system.js"></script>
-<script src="auth-system.js"></script>
+
 
 <!-- في نهاية body وقبل إغلاق </body> -->
 <script src="ratings-system.js"></script>
@@ -3842,6 +3844,367 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+// ========== نظام التوثيق (Authentication System) ==========
+const AuthSystem = {
+    getUsers: function() {
+        return JSON.parse(localStorage.getItem('neonStoreUsers')) || [];
+    },
+
+    saveUsers: function(users) {
+        localStorage.setItem('neonStoreUsers', JSON.stringify(users));
+    },
+
+    login: function(identifier, password) {
+        const users = this.getUsers();
+        
+        // البحث بالمستخدم الافتراضي
+        if (identifier === 'ahmadaiiroot@gmail.com' && password === '123456') {
+            return {
+                success: true,
+                message: 'تم تسجيل الدخول بنجاح!',
+                user: {
+                    id: 1,
+                    name: "حمزة",
+                    email: "ahmadaiiroot@gmail.com",
+                    phone: "0790680891",
+                    address: "عمان، الأردن",
+                    avatar: "h9zi.jpeg",
+                    memberSince: "2023"
+                }
+            };
+        }
+        
+        // البحث عن المستخدم
+        const user = users.find(u => 
+            u.email === identifier || u.phone === identifier
+        );
+        
+        if (!user) {
+            return {
+                success: false,
+                message: 'البريد الإلكتروني أو رقم الهاتف غير مسجل'
+            };
+        }
+        
+        if (user.password !== password) {
+            return {
+                success: false,
+                message: 'كلمة المرور غير صحيحة'
+            };
+        }
+        
+        // حفظ حالة تسجيل الدخول
+        localStorage.setItem('neonStoreCurrentUser', JSON.stringify({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            address: user.address,
+            avatar: user.avatar || 'default-avatar.jpg', // صورة افتراضية إذا لم توجد
+            memberSince: user.createdAt ? user.createdAt.substring(0, 4) : '2023'
+        }));
+        
+        return {
+            success: true,
+            message: 'تم تسجيل الدخول بنجاح!'
+        };
+    },
+
+    register: function(userData) {
+        const users = this.getUsers();
+        
+        // التحقق من وجود المستخدم مسبقاً
+        const existingUser = users.find(u => 
+            u.email === userData.email || u.phone === userData.phone
+        );
+        
+        if (existingUser) {
+            return {
+                success: false,
+                message: 'البريد الإلكتروني أو رقم الهاتف مسجل مسبقاً'
+            };
+        }
+        
+        // إنشاء مستخدم جديد
+        const newUser = {
+            id: Date.now(),
+            name: userData.name,
+            email: userData.email,
+            phone: userData.phone,
+            password: userData.password,
+            address: userData.address || 'غير محدد',
+            avatar: userData.avatar || null, // حفظ الصورة المضغوطة
+            createdAt: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        this.saveUsers(users);
+        
+        // تسجيل الدخول تلقائياً بعد التسجيل
+        localStorage.setItem('neonStoreCurrentUser', JSON.stringify({
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            phone: newUser.phone,
+            address: newUser.address,
+            avatar: newUser.avatar || 'default-avatar.jpg',
+            memberSince: new Date().getFullYear().toString()
+        }));
+        
+        return {
+            success: true,
+            message: 'تم إنشاء الحساب بنجاح!'
+        };
+    },
+
+    // التحقق من حالة تسجيل الدخول
+    isLoggedIn: function() {
+        return localStorage.getItem('neonStoreCurrentUser') !== null;
+    },
+
+    // تسجيل الخروج
+    logout: function() {
+        localStorage.removeItem('neonStoreCurrentUser');
+        return {
+            success: true,
+            message: 'تم تسجيل الخروج بنجاح'
+        };
+    },
+
+    // الحصول على بيانات المستخدم الحالي
+    getCurrentUser: function() {
+        const user = localStorage.getItem('neonStoreCurrentUser');
+        return user ? JSON.parse(user) : null;
+    },
+
+    // إضافة مستخدم افتراضي للاختبار
+    initializeDefaultUser: function() {
+        const users = this.getUsers();
+        const defaultUserExists = users.some(u => u.email === 'ahmadaiiroot@gmail.com');
+        
+        if (!defaultUserExists) {
+            users.push({
+                id: 1,
+                name: 'حمزة',
+                email: 'ahmadaiiroot@gmail.com',
+                phone: '0790680891',
+                password: '123456',
+                address: 'عمان، الأردن',
+                createdAt: '2023-01-01'
+            });
+            this.saveUsers(users);
+        }
+    }
+};
+
+// تهيئة المستخدم الافتراضي عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    AuthSystem.initializeDefaultUser();
+    
+    // تحديث حالة المستخدم في الواجهة
+    const currentUser = AuthSystem.getCurrentUser();
+    if (currentUser) {
+        // تحديث الاسم المعروض
+        const userDisplayName = document.getElementById('userDisplayName');
+        if (userDisplayName) {
+            userDisplayName.textContent = currentUser.name;
+        }
+        
+        // تحديث بيانات الحساب
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('userEmail').textContent = currentUser.email;
+        document.getElementById('userPhone').textContent = currentUser.phone;
+        document.getElementById('userAddress').textContent = currentUser.address;
+        
+        // إظهار روابط المستخدم وإخفاء روابط التسجيل
+        const authLinks = document.querySelector('.auth-links');
+        const headerActions = document.querySelector('.header-actions');
+        
+        if (authLinks && headerActions) {
+            authLinks.style.display = 'none';
+            headerActions.style.display = 'flex';
+        }
+    }
+});
+
+// تحديث دالة تسجيل الخروج في index.html
+function logout() {
+    if (confirm('هل تريد تسجيل الخروج؟')) {
+        AuthSystem.logout();
+        showNotification('تم تسجيل الخروج بنجاح', 'success');
+        
+        // إعادة التوجيه إلى الصفحة الرئيسية
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    }
+}
+// ========== تغيير الصورة الشخصية ==========
+function changeProfilePicture() {
+    // إنشاء نافذة منبثقة
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>تغيير الصورة الشخصية</h3>
+                <button class="close-modal" onclick="this.closest('.modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div id="avatarChangePreview" style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; margin: 0 auto 20px; border: 3px solid var(--galaxy-cyan);">
+                        <img id="avatarPreviewImg" src="${document.getElementById('userAvatar').src}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <input type="file" id="newAvatarInput" accept="image/*" style="display: none;">
+                    <button class="cta-button" onclick="document.getElementById('newAvatarInput').click()">
+                        <i class="fas fa-upload"></i> اختر صورة جديدة
+                    </button>
+                    <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 10px;">الحجم الأقصى 1MB</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="cta-button" style="flex: 1;" onclick="saveNewAvatar()">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                    <button class="secondary-btn" style="flex: 1;" onclick="this.closest('.modal').remove()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // عند اختيار صورة جديدة
+    document.getElementById('newAvatarInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 1048576) {
+                showNotification('حجم الصورة كبير جداً. يرجى اختيار صورة أقل من 1MB', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('avatarPreviewImg').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+function saveNewAvatar() {
+    const newAvatarInput = document.getElementById('newAvatarInput');
+    const newAvatarSrc = document.getElementById('avatarPreviewImg').src;
+    
+    if (!newAvatarInput.files.length) {
+        showNotification('لم تقم باختيار صورة جديدة', 'error');
+        return;
+    }
+    
+    // ضغط الصورة
+    const file = newAvatarInput.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(event) {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // تحديد الأبعاد
+            canvas.width = 400;
+            canvas.height = 400;
+            ctx.drawImage(img, 0, 0, 400, 400);
+            
+            const compressedAvatar = canvas.toDataURL('image/jpeg', 0.7);
+            
+            // تحديث الصورة في الواجهة
+            document.getElementById('userAvatar').src = compressedAvatar;
+            document.querySelector('.user-avatar img').src = compressedAvatar;
+            
+            // تحديث الصورة في بيانات المستخدم
+            const currentUser = AuthSystem.getCurrentUser();
+            if (currentUser) {
+                currentUser.avatar = compressedAvatar;
+                localStorage.setItem('neonStoreCurrentUser', JSON.stringify(currentUser));
+                
+                // تحديث في قائمة المستخدمين
+                const users = AuthSystem.getUsers();
+                const userIndex = users.findIndex(u => u.email === currentUser.email);
+                if (userIndex !== -1) {
+                    users[userIndex].avatar = compressedAvatar;
+                    localStorage.setItem('neonStoreUsers', JSON.stringify(users));
+                }
+            }
+            
+            showNotification('تم تحديث الصورة الشخصية بنجاح', 'success');
+            document.querySelector('.modal').remove();
+        };
+    };
+}
+
+// إضافة زر تغيير الصورة في قسم الحساب
+function addChangePictureButton() {
+    const avatarContainer = document.querySelector('.account-avatar');
+    if (avatarContainer) {
+        const changeBtn = document.createElement('button');
+        changeBtn.innerHTML = '<i class="fas fa-camera"></i> تغيير الصورة';
+        changeBtn.style.cssText = `
+            position: absolute;
+            bottom: 10px;
+            right: 50%;
+            transform: translateX(50%);
+            background: rgba(26, 26, 46, 0.9);
+            color: var(--galaxy-cyan);
+            border: 1px solid var(--galaxy-cyan);
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        `;
+        changeBtn.onmouseenter = function() {
+            this.style.background = 'var(--galaxy-cyan)';
+            this.style.color = 'var(--galaxy-black)';
+        };
+        changeBtn.onmouseleave = function() {
+            this.style.background = 'rgba(26, 26, 46, 0.9)';
+            this.style.color = 'var(--galaxy-cyan)';
+        };
+        changeBtn.onclick = changeProfilePicture;
+        
+        avatarContainer.style.position = 'relative';
+        avatarContainer.appendChild(changeBtn);
+    }
+}
+
+// تعديل دالة تهيئة نظام المستخدم
+function initializeUserSystem() {
+    const currentUser = AuthSystem.getCurrentUser();
+    
+    if (currentUser) {
+        // تحديث الصورة إذا كانت موجودة
+        const userAvatar = document.getElementById('userAvatar');
+        const navAvatar = document.querySelector('.user-avatar img');
+        
+        if (currentUser.avatar && currentUser.avatar !== 'default-avatar.jpg' && currentUser.avatar !== 'h9zi.jpeg') {
+            userAvatar.src = currentUser.avatar;
+            navAvatar.src = currentUser.avatar;
+        }
+        
+        // ... بقية الكود كما هو
+    }
+    
+    // إضافة زر تغيير الصورة
+    setTimeout(() => {
+        addChangePictureButton();
+    }, 500);
+}
 </script>
 </body>
 </html>
