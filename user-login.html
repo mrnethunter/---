@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نييون ستور</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --galaxy-black: #0c0c1d;
+            --galaxy-dark: #1a1a2e;
+            --galaxy-blue: #16213e;
+            --galaxy-purple: #4a1e5a;
+            --galaxy-pink: #9d4edd;
+            --galaxy-light: #e0aaff;
+            --galaxy-cyan: #00bbf9;
+            --galaxy-green: #00f5d4;
+            --galaxy-orange: #ff6b35;
+            --text-light: #f8f9fa;
+            --text-gray: #adb5bd;
+            --glass-bg: rgba(26, 26, 46, 0.7);
+            --glass-border: rgba(157, 78, 221, 0.2);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* النجوم الطائرة */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: fly linear infinite;
+        }
+        
+        @keyframes fly {
+            from {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100vh) translateX(var(--random-x)) rotate(180deg);
+                opacity: 0;
+            }
+        }
+        
+        /* تأثير النجوم الساطعة */
+        .twinkle-star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+            filter: blur(0.5px);
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { 
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+        
+        /* تأثير النييون في الخلفية */
+        .neon-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 187, 249, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 187, 249, 0.05) 1px, transparent 1px),
+                radial-gradient(circle at 30% 30%, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(0, 187, 249, 0.1) 0%, transparent 50%);
+            background-size: 60px 60px, 60px 60px, 300px 300px, 300px 300px;
+            z-index: -1;
+            animation: gridMove 40s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); }
+            100% { transform: translateY(60px) translateX(60px) rotate(0.5deg); }
+        }
+        
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                var(--galaxy-cyan), 
+                var(--galaxy-pink), 
+                transparent);
+            animation: logoGlow 3s linear infinite;
+        }
+        
+        @keyframes logoGlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .login-header i {
+            color: var(--galaxy-cyan);
+            font-size: 3rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(0, 187, 249, 0.5));
+        }
+        
+        .login-header h1 {
+            color: var(--galaxy-cyan);
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .login-header p {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(26, 26, 46, 0.6);
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--galaxy-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 187, 249, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--galaxy-cyan), var(--galaxy-pink));
+            border: none;
+            border-radius: 10px;
+            color: var(--galaxy-black);
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 187, 249, 0.3);
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(157, 78, 221, 0.2);
+            color: var(--text-gray);
+        }
+        
+        .login-footer a {
+            color: var(--galaxy-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .login-footer a:hover {
+            color: var(--galaxy-pink);
+        }
+        
+        .notification-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 380px;
+        }
+        
+        .notification {
+            background: linear-gradient(135deg, var(--galaxy-dark), var(--galaxy-blue));
+            color: white;
+            padding: 18px 22px;
+            border-radius: 15px;
+            border-left: 6px solid var(--galaxy-cyan);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transform: translateX(400px) scale(0.9);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .notification.show {
+            transform: translateX(0) scale(1);
+        }
+        
+        .notification-icon {
+            font-size: 26px;
+            flex-shrink: 0;
+        }
+        
+        .notification.success .notification-icon {
+            color: var(--galaxy-green);
+            filter: drop-shadow(0 0 8px rgba(0, 245, 212, 0.3));
+        }
+        
+        .notification.error .notification-icon {
+            color: #ff6b6b;
+            filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.3));
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 1.05rem;
+            color: var(--text-light);
+        }
+        
+        .notification-message {
+            font-size: 0.95rem;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 30px 25px;
+            }
+            
+            .login-header h1 {
+                font-size: 1.7rem;
+            }
+            
+            .notification-container {
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- النجوم الطائرة -->
+    <div class="stars" id="stars"></div>
+    <div class="neon-grid"></div>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-user-astronaut"></i>
+                <h1>تسجيل الدخول</h1>
+                <p>مرحباً بعودتك إلى نييون ستور</p>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="phone" class="form-label">رقم الهاتف</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="أدخل رقم هاتفك" required>
+                    <small style="color: var(--text-gray); font-size: 0.8rem; display: block; margin-top: 5px;">يجب أن يكون 10 أرقام</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="name" class="form-label">الاسم الكامل</label>
+                    <input type="text" id="name" class="form-control" placeholder="أدخل اسمك الكامل" required>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    تسجيل الدخول / إنشاء حساب
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>بالنقر على زر تسجيل الدخول، أنت توافق على <a href="#">الشروط والأحكام</a></p>
+                <p style="margin-top: 15px;"><a href="index.html"><i class="fas fa-arrow-right"></i> العودة إلى المتجر</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+    <script>
+        // إنشاء النجوم الطائرة
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            if (!starsContainer) return;
+            
+            const starCount = 150;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 3 + 1;
+                const speed = Math.random() * 25 + 15;
+                const delay = Math.random() * 25;
+                const randomX = (Math.random() - 0.5) * 150;
+                
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.animationDuration = `${speed}s`;
+                star.style.animationDelay = `${delay}s`;
+                star.style.setProperty('--random-x', `${randomX}vw`);
+                
+                if (Math.random() > 0.6) {
+                    const colors = ['#00bbf9', '#9d4edd', '#00f5d4', '#ff6b6b', '#ff6b35'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    star.style.backgroundColor = color;
+                    star.style.boxShadow = `0 0 15px ${color}, 0 0 30px ${color}`;
+                }
+                
+                starsContainer.appendChild(star);
+            }
+            
+            const twinkleCount = 30;
+            for (let i = 0; i < twinkleCount; i++) {
+                const twinkleStar = document.createElement('div');
+                twinkleStar.classList.add('twinkle-star');
+                
+                const size = Math.random() * 4 + 2;
+                twinkleStar.style.width = `${size}px`;
+                twinkleStar.style.height = `${size}px`;
+                twinkleStar.style.left = `${Math.random() * 100}vw`;
+                twinkleStar.style.top = `${Math.random() * 100}vh`;
+                twinkleStar.style.animationDelay = `${Math.random() * 3}s`;
+                twinkleStar.style.animationDuration = `${Math.random() * 2 + 1.5}s`;
+                
+                if (Math.random() > 0.4) {
+                    const colors = ['#00bbf9', '#9d4edd', '#00f5d4', '#ff6b35'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    twinkleStar.style.backgroundColor = color;
+                    twinkleStar.style.boxShadow = `0 0 20px ${color}`;
+                }
+                
+                starsContainer.appendChild(twinkleStar);
+            }
+        }
+        
+        // نظام الإشعارات
+        function showNotification(message, type = 'info') {
+            const notificationContainer = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+            
+            const titles = {
+                success: 'تم بنجاح',
+                error: 'خطأ',
+                warning: 'تحذير',
+                info: 'معلومة'
+            };
+            
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="${icons[type] || icons.info}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${titles[type] || titles.info}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            notificationContainer.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            const autoClose = setTimeout(() => {
+                closeNotification(notification);
+            }, 5000);
+            
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                clearTimeout(autoClose);
+                closeNotification(notification);
+            });
+        }
+        
+        function closeNotification(notification) {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 500);
+        }
+        
+        // تسجيل الدخول
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const phone = document.getElementById('phone').value.trim();
+            const name = document.getElementById('name').value.trim();
+            
+            if (!phone || !name) {
+                showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+                return;
+            }
+            
+            // التحقق من صحة رقم الهاتف (10 أرقام)
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneRegex.test(phone)) {
+                showNotification('يرجى إدخال رقم هاتف صحيح (10 أرقام)', 'error');
+                return;
+            }
+            
+            // إنشاء بيانات المستخدم
+            const user = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                email: "",
+                address: "",
+                avatar: "h9zi.jpeg",
+                joinedAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                isActive: true
+            };
+            
+            // حفظ بيانات المستخدم في localStorage
+            let users = JSON.parse(localStorage.getItem('neonStoreUsers')) || [];
+            
+            // التحقق إذا كان المستخدم مسجل مسبقاً
+            const existingUserIndex = users.findIndex(u => u.phone === phone);
+            
+            if (existingUserIndex !== -1) {
+                // تحديث بيانات المستخدم الحالي
+                users[existingUserIndex].name = name;
+                users[existingUserIndex].lastLogin = new Date().toISOString();
+                users[existingUserIndex].isActive = true;
+                
+                showNotification(`مرحباً بعودتك ${name}!`, 'success');
+            } else {
+                // إضافة مستخدم جديد
+                users.push(user);
+                showNotification(`مرحباً بك ${name}! تم إنشاء حسابك بنجاح`, 'success');
+            }
+            
+            localStorage.setItem('neonStoreUsers', JSON.stringify(users));
+            
+            // حفظ حالة تسجيل الدخول الحالية
+            localStorage.setItem('neonStoreCurrentUser', JSON.stringify(
+                existingUserIndex !== -1 ? users[existingUserIndex] : user
+            ));
+            
+            // التوجيه إلى الصفحة الرئيسية بعد تأخير بسيط
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+        
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            
+            // إذا كان المستخدم مسجلاً بالفعل، توجيهه إلى الصفحة الرئيسية
+            const currentUser = localStorage.getItem('neonStoreCurrentUser');
+            if (currentUser) {
+                // إعادة توجيه المستخدم بعد 2 ثانية
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
